@@ -1,0 +1,20 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
+# COCO128 dataset https://www.kaggle.com/datasets/ultralytics/coco128 (first 128 images from COCO train2017) by Ultralytics
+# Documentation: https://docs.ultralytics.com/datasets/detect/coco/
+# Example usage: yolo train data=coco128.yaml
+# parent
+# ├── ultralytics
+# └── datasets
+#     └── coco128 ← downloads here (7 MB)
+
+train: C:/Users/adoxd/Desktop/ai/data/images/train
+val: C:/Users/adoxd/Desktop/ai/data/images/val
+
+nc: 1
+names: ["face"]
+
+
+
+# Download script/URL (optional)
+download: https://github.com/ultralytics/assets/releases/download/v0.0.0/coco128.zip
