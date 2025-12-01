@@ -1,56 +1,81 @@
-from ultralytics import YOLO
 import cv2
 import os
 import numpy as np
 import insightface
-
-detector = YOLO("yolov11n-face.pt")
+from numpy.linalg import norm
 
 modelo = insightface.app.FaceAnalysis(name="buffalo_l")
-modelo.prepare(ctx_id=0, det_size=(128, 128))  
+modelo.prepare(ctx_id=0, det_size=(640, 640))
+
 nombre = input("Nombre de la persona: ")
+
 os.makedirs("rostros_guardados", exist_ok=True)
 
 cap = cv2.VideoCapture(0)
 
-print("Presiona S para capturar rostro")
+print("\n=== Registro de rostro multi-ángulo ===")
+print("Mira al frente y presioná S para comenzar\n")
+
+embeddings_capturados = []
+
+pasos = [
+    "Mira al frente",
+    "Girate un poco a la izquierda",
+    "Girate un poco a la derecha",
+    "Mira un poco hacia arriba",
+    "Mira un poco hacia abajo",
+]
+
+paso_idx = 0
 
 while True:
     ret, frame = cap.read()
     if not ret:
         continue
 
-    results = detector(frame)[0]
+    mensaje = pasos[paso_idx] if paso_idx < len(pasos) else "Finalizando..."
+    cv2.putText(frame, mensaje, (20, 40),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
-    for box in results.boxes:
-        x1, y1, x2, y2 = map(int, box.xyxy[0])
+    cv2.imshow("Registro", frame)
 
-        recorte = frame[y1:y2, x1:x2]
+    tecla = cv2.waitKey(1) & 0xFF
 
-        if recorte.size == 0:
+    if tecla == ord('s'):
+
+        caras = modelo.get(frame)
+
+        if len(caras) == 0:
+            print("No se detectó una cara clara. Intentá de nuevo.")
             continue
 
-        cv2.imshow("Rostro detectado", recorte)
+        cara = max(caras, key=lambda c: (c.bbox[2]-c.bbox[0])*(c.bbox[3]-c.bbox[1]))
 
-        if cv2.waitKey(1) & 0xFF == ord('s'):
-            caras = modelo.get(recorte)
+        embedding = cara.embedding
+        embeddings_capturados.append(embedding)
 
-            if len(caras) == 0:
-                print("InsightFace no encontró un rostro en el recorte. Reintentar.")
-                continue
+        print(f"Capturada posición: {pasos[paso_idx]}")
 
-            embedding = caras[0].embedding
-            np.save(f"rostros_guardados/{nombre}.npy", embedding)
-            print(f"Rostro guardado como rostros_guardados/{nombre}.npy")
+        paso_idx += 1
 
-            cap.release()
-            cv2.destroyAllWindows()
-            exit()
+        if paso_idx >= len(pasos):
+            break
 
-    cv2.imshow("Camara", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    if tecla == ord('q'):
+        exit()
 
 cap.release()
 cv2.destroyAllWindows()
 
+if len(embeddings_capturados) == 0:
+    print("No se capturaron rostros. Abortando.")
+    exit()
+
+promedio = np.mean(embeddings_capturados, axis=0)
+promedio = promedio / norm(promedio)
+
+ruta = f"rostros_guardados/{nombre}.npy"
+np.save(ruta, promedio)
+
+print(f"\n=== Registro completado ===")
+print(f"Se guardó el embedding mejorado en: {ruta}")
