@@ -24,16 +24,10 @@ while True:
     img_pred = results.plot()
 
     cv2.imshow("Camara - Detección", img_pred)
-
-    # ============================
-    # Guardar imagen
-    # ============================
+    
     nombre_img = f"{carpeta_salida}/frame_{contador}.jpg"
     cv2.imwrite(nombre_img, img_pred)
 
-    # ============================
-    # Guardar el TXT manualmente
-    # ============================
     nombre_txt = f"{carpeta_salida}/frame_{contador}.txt"
     with open(nombre_txt, "w") as f:
         for box in results.boxes:
@@ -52,3 +46,4 @@ cap.release()
 cv2.destroyAllWindows()
 
 print("Listo. Resultados guardados en:", carpeta_salida)
+
