@@ -2,7 +2,6 @@ import os
 import cv2
 from ultralytics import YOLO
 
-# =============== CONFIG ===============
 MODEL_PATH = "yolov11n-face.pt"
 
 IMAGES_TRAIN = "data/images/train"
@@ -14,10 +13,8 @@ LABELS_VAL   = "data/labels/val"
 os.makedirs(LABELS_TRAIN, exist_ok=True)
 os.makedirs(LABELS_VAL, exist_ok=True)
 
-# =============== LOAD MODEL ===============
 model = YOLO(MODEL_PATH)
 
-# =============== AUTO LABEL FUNCTION ===============
 def autolabel(img_folder, label_folder):
     images = [img for img in os.listdir(img_folder)
               if img.lower().endswith((".jpg", ".jpeg", ".png"))]
@@ -38,7 +35,7 @@ def autolabel(img_folder, label_folder):
 
         h, w = img.shape[:2]
 
-        # Detectar
+        
         results = model(img, verbose=False)[0]
 
         yolo_lines = []
@@ -46,7 +43,6 @@ def autolabel(img_folder, label_folder):
         for box in results.boxes.xyxy:
             x1, y1, x2, y2 = box.tolist()
 
-            # Convertir a YOLO
             xc = ((x1 + x2) / 2) / w
             yc = ((y1 + y2) / 2) / h
             bw = (x2 - x1) / w
@@ -55,12 +51,11 @@ def autolabel(img_folder, label_folder):
             line = f"0 {xc:.6f} {yc:.6f} {bw:.6f} {bh:.6f}\n"
             yolo_lines.append(line)
 
-        # Guardar .txt
         with open(label_path, "w") as f:
             f.writelines(yolo_lines)
 
     print("[OK] Etiquetado finalizado:", label_folder)
 
-# =============== RUN ===============
 autolabel(IMAGES_TRAIN, LABELS_TRAIN)
 autolabel(IMAGES_VAL, LABELS_VAL)
+
