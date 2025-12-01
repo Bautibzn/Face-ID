@@ -10,11 +10,12 @@ I will send you the dataset I used for the yolov11 model.
 
 Link: http://shuoyang1213.me/WIDERFACE/
 
-data
- ├── images
- │    ├── train
- │    └── val
- ├── labels
- │    ├── train
- │    └── val
+ai
+ ├──data
+    ├── images
+    │    ├── train
+    │    └── val
+    ├── labels
+    │    ├── train
+    │    └── val
 
