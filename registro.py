@@ -4,13 +4,10 @@ import os
 import numpy as np
 import insightface
 
-# Cargar detector YOLO
 detector = YOLO("yolov11n-face.pt")
 
-# Cargar InsightFace
 modelo = insightface.app.FaceAnalysis(name="buffalo_l")
-modelo.prepare(ctx_id=0, det_size=(128, 128))  # más rápido y estable
-
+modelo.prepare(ctx_id=0, det_size=(128, 128))  
 nombre = input("Nombre de la persona: ")
 os.makedirs("rostros_guardados", exist_ok=True)
 
@@ -28,7 +25,6 @@ while True:
     for box in results.boxes:
         x1, y1, x2, y2 = map(int, box.xyxy[0])
 
-        # RECORTE DEL ROSTRO
         recorte = frame[y1:y2, x1:x2]
 
         if recorte.size == 0:
@@ -40,12 +36,12 @@ while True:
             caras = modelo.get(recorte)
 
             if len(caras) == 0:
-                print("❌ InsightFace no encontró un rostro en el recorte. Reintentar.")
+                print("InsightFace no encontró un rostro en el recorte. Reintentar.")
                 continue
 
             embedding = caras[0].embedding
             np.save(f"rostros_guardados/{nombre}.npy", embedding)
-            print(f"✔️ Rostro guardado como rostros_guardados/{nombre}.npy")
+            print(f"Rostro guardado como rostros_guardados/{nombre}.npy")
 
             cap.release()
             cv2.destroyAllWindows()
@@ -57,3 +53,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+
