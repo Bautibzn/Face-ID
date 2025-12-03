@@ -10,7 +10,8 @@ from collections import deque
 detector = YOLO("yolov11n-face.pt")
 
 modelo = insightface.app.FaceAnalysis(name="buffalo_l")
-modelo.prepare(ctx_id=0, det_size=(256, 256))
+modelo.prepare(ctx_id=0, det_size=(640, 640))
+
 
 embeddings = {}
 carpeta = "rostros_guardados"
@@ -40,7 +41,7 @@ def reconocer_emb(embedding_input):
             mejor_distancia = d
             mejor_nombre = nombre
 
-    if mejor_distancia < 0.45:
+    if mejor_distancia < 0.40:
         return mejor_nombre, mejor_distancia
 
     return "Desconocido", mejor_distancia
