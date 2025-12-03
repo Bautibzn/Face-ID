@@ -54,7 +54,6 @@ contador_desconocidos = 1
 
 buffer_nombres = deque(maxlen=5)
 
-# NUEVO: temporizador para desconocidos
 tiempo_inicio_desconocido = None
 segundos_para_guardar = 3
 
@@ -71,7 +70,6 @@ while True:
 
     resultados = detector(frame)[0]
 
-    # Ejecutar InsightFace SOLO UNA VEZ POR FRAME → MUCHO MÁS FLUIDO
     analisis = modelo.get(frame)
 
     for box in resultados.boxes:
@@ -94,9 +92,6 @@ while True:
         buffer_nombres.append(nombre)
         nombre_estable = max(set(buffer_nombres), key=buffer_nombres.count)
 
-        # =============================
-        #      SISTEMA DE TIMER
-        # =============================
         if nombre_estable == "Desconocido":
             if tiempo_inicio_desconocido is None:
                 tiempo_inicio_desconocido = time.time()
